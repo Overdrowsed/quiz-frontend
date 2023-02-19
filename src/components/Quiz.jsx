@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import './Quiz.css'
 
 const fetchCorrectAnswer = async (id) => {
-    const result = await fetch(`http://192.168.0.103:8080/get-correct-answer/${id}`)
+    const result = await fetch(`http://localhost:8080/get-correct-answer/${id}`)
     
     return await result.json()
 }

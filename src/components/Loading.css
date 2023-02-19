@@ -1,0 +1,13 @@
+.loading{
+    border: max(3vh, 16px) solid #f3f3f3;
+    border-top: max(3vh, 16px) solid hsl(300, 51%, 29%);
+    border-radius: 50%;
+    height: max(15vh, 100px);
+    aspect-ratio: 1;
+    animation: spin 2s linear infinite
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

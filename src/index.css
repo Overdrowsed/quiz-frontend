@@ -5,7 +5,6 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -14,19 +13,21 @@
   -webkit-text-size-adjust: 100%;
 
   --primary-color: hsl(300, 51%, 29%);
+  --background-color: #213547;
 }
 
-*{
+* {
     box-sizing: border-box;
 }
 
-body{
+body {
     margin: 0;
 }
 
-#root{
-    background-color: #213547;
+#root {
+    background-color: var(--background-color);
     height: 100vh;
+    height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;

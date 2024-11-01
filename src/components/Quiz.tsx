@@ -1,15 +1,10 @@
 import { useRef, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
+import Score from './Score';
+import FinalScore from './FinalScore';
+
 import './Quiz.css';
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL as string;
-
-const fetchCorrectAnswer = async (id: number) => {
-    const result = await fetch(`${backendUrl}/get-correct-answer/${id}`);
-    
-    return await result.json();
-}
 
 type Answer = {
     id:   number;
@@ -24,8 +19,16 @@ type Question = {
 
 type Quiz = Question[];
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL as string;
+
+const fetchCorrectAnswer = async (id: number) => {
+    const result = await fetch(`${backendUrl}/get-correct-answer/${id}`);
+    
+    return await result.json();
+}
+
 export default function Quiz() {
-    const { data }: { data: Quiz } = useSuspenseQuery<Quiz>({
+    const { data } = useSuspenseQuery<Quiz>({
         queryKey: ['quiz'],
         queryFn: () =>
             fetch(`${backendUrl}/get-quiz`)
@@ -33,7 +36,7 @@ export default function Quiz() {
         staleTime: Infinity,
     });
 
-    const answerId = useRef<number | null>(null);
+    const selectedAnswerId = useRef<number | null>(null);
     const hasAnswered = useRef(false);
     const correctAnswers = useRef(0);
     const totalAnswers = useRef(0);
@@ -44,14 +47,10 @@ export default function Quiz() {
 
     if (quiz.length === 0) {
         return (
-            <>
-                <div className='score'>
-                    { `${correctAnswers.current}/${totalAnswers.current}` }
-                </div>
-                <div className='score'>
-                    { `${Math.round(correctAnswers.current / totalAnswers.current * 100)}%` }
-                </div>
-            </>
+            <FinalScore
+              correctAnswers={ correctAnswers.current }
+              totalAnswers={ totalAnswers.current }
+            />
         );
     }
 
@@ -59,7 +58,7 @@ export default function Quiz() {
         setTimeout(() => {
             totalAnswers.current++;
 
-            if (answerId.current === correctAnswerId) {
+            if (selectedAnswerId.current === correctAnswerId) {
                 correctAnswers.current++;
             }
 
@@ -82,25 +81,26 @@ export default function Quiz() {
             }
 
             hasAnswered.current = true;
-            answerId.current = id;
+            selectedAnswerId.current = id;
             fetchCorrectAnswer(question.id).then(id => { setCorrectAnswerId(id) });
         }
     }
 
     return (
         <>
-            <div className='score'>
-                { `${correctAnswers.current}/${totalAnswers.current}` }
-            </div>
+            <Score
+              correctAnswers={ correctAnswers.current }
+              totalAnswers={ totalAnswers.current }
+            />
             <div className='quiz'>
                 <div className='question'> { question.prompt } </div>
                 <div className='answers'>
                     {
                         question.answers.map(
-                            ({ id, text }: { id: number, text: string }) => {
+                            ({ id, text }) => {
                                 const answerClassName = id === correctAnswerId
                                     ? 'correct'
-                                : answerId.current === id
+                                : selectedAnswerId.current === id
                                     ? 'wrong'
                                 :'';
                                 

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { persistQueryClientSave } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { ErrorBoundary } from 'react-error-boundary';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -33,11 +34,13 @@ export default function App() {
     }, []);
 
     return (
-        <QueryClientProvider client={ queryClient } >
-            <Suspense fallback={ <Loading/> } >
-                <Quiz />
-            </Suspense>
-            <ReactQueryDevtools />
-        </QueryClientProvider>
+        <ErrorBoundary fallback={ <h3>Unable to retrieve quiz</h3> }>
+            <QueryClientProvider client={ queryClient } >
+                <Suspense fallback={ <Loading/> } >
+                    <Quiz />
+                </Suspense>
+                <ReactQueryDevtools />
+            </QueryClientProvider>
+        </ErrorBoundary>
     );
 }

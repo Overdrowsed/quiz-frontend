@@ -9,40 +9,40 @@ const fetchCorrectAnswer = async (id: number) => {
     return await result.json();
 }
 
+type Answer = {
+    id:   number;
+    text: string;
+};
+
+type Question = {
+    id:      number;
+    prompt:  string;
+    answers: Answer[];
+};
+
+type Quiz = Question[];
+
 export default function Quiz() {
-    // const {
-    //     data: {
-    //         quiz,
-    //         correctAnswers: initialCorrectAnswers,
-    //         totalAnswers: initialTotalAnswers
-    //     } 
-    // } = useSuspenseQuery({
-    //     queryKey: ['quiz'],
-    //     queryFn: () =>
-    //         fetch('http://localhost:8080/get-quiz')
-    //         .then(res => res.json()),
-    //     staleTime: Infinity,
-    // });
-    const {
-        data: quiz
-    } = useSuspenseQuery({
+    const backendUrl = process.env.REACT_APP_BACKEND_URL as string;
+
+    const { data }: { data: Quiz } = useSuspenseQuery<Quiz>({
         queryKey: ['quiz'],
         queryFn: () =>
-            fetch('http://localhost:8080/get-quiz')
+            fetch(`${backendUrl}/get-quiz`)
             .then(res => res.json()),
         staleTime: Infinity,
     });
 
-    const answerId = useRef<number>();
+    const answerId = useRef<number | null>(null);
     const hasAnswered = useRef(false);
-    // const correctAnswers = useRef(initialCorrectAnswers);
-    // const totalAnswers = useRef(initialTotalAnswers);
     const correctAnswers = useRef(0);
     const totalAnswers = useRef(0);
-    const [correctAnswerId, setCorrectAnswerId] = useState();
-    const [questionIndex, setQuestionIndex] = useState(Math.floor(Math.random() * quiz.length));
+    const questionIndex = useRef(Math.floor(Math.random() * data.length));
 
-    if (totalAnswers.current === quiz.length) {
+    const [quiz, setQuiz] = useState(data);
+    const [correctAnswerId, setCorrectAnswerId] = useState<number | null>(null);
+
+    if (quiz.length === 0) {
         return (
             <>
                 <div className='score'>
@@ -65,11 +65,15 @@ export default function Quiz() {
 
             hasAnswered.current = false;
 
-            setQuestionIndex(Math.floor(Math.random() * quiz.length));
+            quiz.splice(questionIndex.current, 1);
+
+            questionIndex.current = Math.floor(Math.random() * quiz.length)
+
+            setQuiz([...quiz]);
         }, 3000);
     }
 
-    const question = quiz[questionIndex];
+    const question = quiz[questionIndex.current];
 
     const onAnswer = (id: number) => {
         return () => {
@@ -93,8 +97,8 @@ export default function Quiz() {
                 <div className='answers'>
                     {
                         question.answers.map(
-                            ({ id, answer }: { id: any, answer: any }) => {
-                                const className = id === correctAnswerId
+                            ({ id, text }: { id: number, text: string }) => {
+                                const answerClassName = id === correctAnswerId
                                     ? 'correct'
                                 : answerId.current === id
                                     ? 'wrong'
@@ -102,11 +106,11 @@ export default function Quiz() {
                                 
                                 return (
                                     <button
-                                      className={ `answer ${className}` }
+                                      className={ `answer ${answerClassName}` }
                                       key={ id }
                                       onClick={ onAnswer(id) }
                                     >
-                                        { answer }
+                                        { text }
                                     </button>
                                 );
                             }

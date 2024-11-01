@@ -3,8 +3,10 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 
 import './Quiz.css';
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL as string;
+
 const fetchCorrectAnswer = async (id: number) => {
-    const result = await fetch(`http://localhost:8080/get-correct-answer/${id}`);
+    const result = await fetch(`${backendUrl}/get-correct-answer/${id}`);
     
     return await result.json();
 }
@@ -23,8 +25,6 @@ type Question = {
 type Quiz = Question[];
 
 export default function Quiz() {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL as string;
-
     const { data }: { data: Quiz } = useSuspenseQuery<Quiz>({
         queryKey: ['quiz'],
         queryFn: () =>

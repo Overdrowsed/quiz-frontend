@@ -65,7 +65,7 @@ export default function Quiz() {
 
             quiz.splice(questionIndex.current, 1);
 
-            questionIndex.current = Math.floor(Math.random() * quiz.length)
+            questionIndex.current = Math.floor(Math.random() * quiz.length);
 
             setQuiz([...quiz]);
         }, 3000);
@@ -96,7 +96,7 @@ export default function Quiz() {
                             ({ id, text }) => {
                                 const answerClassName = id === correctAnswerId
                                     ? 'correct'
-                                : selectedAnswerId.current === id
+                                : id === selectedAnswerId.current
                                     ? 'wrong'
                                 :'';
                                 

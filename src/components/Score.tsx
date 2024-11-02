@@ -4,7 +4,7 @@ import { RootState } from '../store/store';
 import './Score.css';
 
 export default function Score() {
-    const { correctAnswers, totalAnswers } = useSelector((state: RootState) => state.score)
+    const { correctAnswers, totalAnswers } = useSelector((state: RootState) => state.score);
 
     return (
         <div className='score'>

@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+import { correctAnswer, wrongAnswer } from '../store/scoreSlice';
 
 import Score from './Score';
 import FinalScore from './FinalScore';
@@ -19,7 +21,7 @@ type Question = {
 
 type Quiz = Question[];
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL as string;
+const backendUrl = import.meta.env.VITE_BACKEND_URL as string;
 
 const fetchCorrectAnswer = async (id: number) => {
     const result = await fetch(`${backendUrl}/get-correct-answer/${id}`);
@@ -36,10 +38,10 @@ export default function Quiz() {
         staleTime: Infinity,
     });
 
+    const dispatch = useDispatch();
+
     const selectedAnswerId = useRef<number | null>(null);
     const hasAnswered = useRef(false);
-    const correctAnswers = useRef(0);
-    const totalAnswers = useRef(0);
     const questionIndex = useRef(Math.floor(Math.random() * data.length));
 
     const [quiz, setQuiz] = useState(data);
@@ -47,19 +49,16 @@ export default function Quiz() {
 
     if (quiz.length === 0) {
         return (
-            <FinalScore
-              correctAnswers={ correctAnswers.current }
-              totalAnswers={ totalAnswers.current }
-            />
+            <FinalScore showPercentage />
         );
     }
 
     if (hasAnswered.current) {
-        setTimeout(() => {
-            totalAnswers.current++;
-
+        setTimeout(() => {        
             if (selectedAnswerId.current === correctAnswerId) {
-                correctAnswers.current++;
+                dispatch(correctAnswer());
+            } else {
+                dispatch(wrongAnswer());
             }
 
             hasAnswered.current = false;
@@ -88,10 +87,7 @@ export default function Quiz() {
 
     return (
         <>
-            <Score
-              correctAnswers={ correctAnswers.current }
-              totalAnswers={ totalAnswers.current }
-            />
+            <Score />
             <div className='quiz'>
                 <div className='question'> { question.prompt } </div>
                 <div className='answers'>

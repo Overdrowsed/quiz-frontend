@@ -1,22 +1,26 @@
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+
 import Score from './Score';
 
 import './Score.css'
+import { PropsWithChildren } from 'react';
 
 type Props = {
-    correctAnswers: number,
-    totalAnswers: number,
-}
+    showPercentage?: boolean,
+};
 
-export default function FinalScore({ correctAnswers, totalAnswers }: Props) {
+export default function FinalScore({ showPercentage = false }: PropsWithChildren<Props>) {
+    const { correctAnswers, totalAnswers } = useSelector((state: RootState) => state.score)
+    console.log(showPercentage)
     return (
         <>
-            <Score
-            correctAnswers={ correctAnswers }
-            totalAnswers={ totalAnswers }
-            />
+            <Score />
+            { showPercentage &&
             <div className='score'>
                 { `${Math.round(correctAnswers / totalAnswers * 100)}%` }
             </div>
+            }
         </>
     );
 }

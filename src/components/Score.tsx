@@ -1,11 +1,11 @@
-import './Score.css'
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
-type Props = {
-    correctAnswers: number,
-    totalAnswers: number,
-}
+import './Score.css';
 
-export default function Score({ correctAnswers, totalAnswers }: Props) {
+export default function Score() {
+    const { correctAnswers, totalAnswers } = useSelector((state: RootState) => state.score)
+
     return (
         <div className='score'>
             {`${correctAnswers}/${totalAnswers}`}

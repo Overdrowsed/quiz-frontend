@@ -1,11 +1,14 @@
 import { Suspense, useEffect } from 'react';
-import Quiz from './components/Quiz';
-import Loading from './components/Loading';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { persistQueryClientSave } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { ErrorBoundary } from 'react-error-boundary';
+import { Provider } from 'react-redux';
+import store from './store/store';
+
+import Quiz from './components/Quiz';
+import Loading from './components/Loading';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -34,13 +37,15 @@ export default function App() {
     }, []);
 
     return (
-        <ErrorBoundary fallback={ <h3>Unable to retrieve quiz</h3> }>
+        <Provider store={ store }>
             <QueryClientProvider client={ queryClient } >
-                <Suspense fallback={ <Loading/> } >
-                    <Quiz />
-                </Suspense>
+                <ErrorBoundary fallback={ <h3>Unable to retrieve quiz</h3> }>
+                    <Suspense fallback={ <Loading/> } >
+                        <Quiz />
+                    </Suspense>
+                </ErrorBoundary>
                 <ReactQueryDevtools />
             </QueryClientProvider>
-        </ErrorBoundary>
+        </Provider>
     );
 }
